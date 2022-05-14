@@ -53,6 +53,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form_Modal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Modal.Designer.cs">
+      <DependentUpon>Form_Modal.cs</DependentUpon>
+    </Compile>
     <Compile Include="GameStatus.cs" />
     <Compile Include="Menu.cs">
       <SubType>Form</SubType>
@@ -65,6 +71,9 @@
     <Compile Include="Vector2D.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Modal.resx">
+      <DependentUpon>Form_Modal.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Menu.resx">
       <DependentUpon>Menu.cs</DependentUpon>
@@ -94,6 +103,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BGMenu2.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BackImageModalW.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

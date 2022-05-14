@@ -35,6 +35,8 @@ namespace TestProject
         int at = 1;
         Random rnd;
         bool isNotUsed = true;
+        // для паузы в игре
+        bool isNotStoped = true;
 
         // переменные отвечающие за границы игрового поля
         int leftGameWallX1;
@@ -49,6 +51,7 @@ namespace TestProject
         // для черных линий 
         int blackLineHeight;
         int dHeight;
+
 
 
 
@@ -97,7 +100,29 @@ namespace TestProject
         private void button1_Click(object sender, EventArgs e)
         {
             this.Close();
+            GameStatus.playerRound = 0;
+            GameStatus.playerScore = 0;
+            GameStatus.botRound = 1;
+            GameStatus.botScore = 0;
             menuF.Visible = true;
+        }
+
+        // пауза в игре
+        // при первом нажатии игра останавливается, при повторном продолжается
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (isNotStoped)
+            {
+                timer1.Enabled = false;
+                isNotStoped = false;
+                button3.BackColor = Color.Chocolate;
+            }
+            else
+            {
+                timer1.Enabled = true;
+                isNotStoped = true;
+                button3.BackColor = ColorTranslator.FromHtml("#FFFFF0");
+            }
         }
 
         // Принудительно закрыть игру
@@ -158,19 +183,23 @@ namespace TestProject
             font = new Font("Times New Roman", 13.0f);
 
             // кнопки вернуться в меню и выйти из игры(закрыть приложение)
-            button1.Size = new Size(140, 50);
+            button1.Size = new Size(140, 40);
             button2.Size = new Size(140, 50);
+            button3.Size = new Size(140, 40);
 
             // будущее расположение кнопок, задается отн-но экрана 
             Point p1 = new Point((this.ClientSize.Width / 4 - button1.Width) / 2, 10);
             Point p2 = new Point((this.ClientSize.Width / 4 - button2.Width) / 2 +
                                     (this.ClientSize.Width - this.ClientSize.Width / 4), 10);
+            Point p3 = new Point((this.ClientSize.Width / 4 - button1.Width) / 2, p1.Y + button1.Height + 2);
             // фон кнопок в цвет фона
             button1.BackColor = ColorTranslator.FromHtml("#FFFFF0");
             button2.BackColor = ColorTranslator.FromHtml("#FFFFF0");
+            button3.BackColor = ColorTranslator.FromHtml("#FFFFF0");
             // задание расположения кнопкам
             button1.Location = p1;
             button2.Location = p2;
+            button3.Location = p3;
 
             // инициализация шара, задание расположения
             ball = new Ball(60, 10, new Vector2D(400, 560));
@@ -359,6 +388,12 @@ namespace TestProject
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            // по завершении 10 раундов появляется окошко с результатами
+            if (GameStatus.botRound > 10)
+            {
+                timer1.Enabled = false;
+                ShowModalWindow(menuF, this);
+            }
             // ДЛЯ ТЕБЯ
             // тута код с ботом, код отсчета таймера, код подсчета сбитых кегель
             //
@@ -366,7 +401,7 @@ namespace TestProject
             // интервал таймера равен 10 (10*100=1000мс=1сек)
             //тут можно менять число в сравнении, пока тесты, тут стоит 600(6сек +-), но потом ставь 1000-1500 значение равное 15-30сек в реальности
             // лучше будет что-то около 10сек = 1000 в коде сравнения ниже
-            if (GameStatus.playerRound >= 600)
+            if (GameStatus.playerRound >= 200)
             {
                 // at - переменная, которая в случае 1 означает, что ход игрока, в случае -1, что ход бота
                 if (at == 1)
@@ -508,7 +543,14 @@ namespace TestProject
             }
 
         }
-        
+
+        public void ShowModalWindow(Form menuFF, Form gameFF)
+        {
+            Form_Modal m = new Form_Modal(menuFF, gameFF);
+            m.ShowDialog();
+        }
+
+
     }
 }
 
