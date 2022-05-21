@@ -25,6 +25,8 @@ namespace TestProject
         Point mouseLocation2;
         // нажата ли кнопка мыши
         bool mouseDown;
+        // нажата ли правая кнопка
+        bool mouseRightB;
         // массив кегель
         Ball[] arrPins = new Ball[10];
         // рисовка графики вне Paint
@@ -313,15 +315,23 @@ namespace TestProject
         // возникает при нажатии кнопки мыши
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
-            //кнопка мыши зажата
-            mouseDown = true;
+            //кнопка мыши зажата и в зависимости от какой(лкм или пкм) задается значение определенному параметру
+            if (e.Button == MouseButtons.Left)
+            {
+                mouseDown = true;
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                mouseRightB = true;
+            }
+
             mouseLocation1 = e.Location;
         }
 
         // возникает при перемещении курсора с зажатой кнопкой
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
-            // если кнопка мыши зажата
+            // если левая кнопка мыши зажата
             if (mouseDown)
             {
                 mouseLocation2 = e.Location;
@@ -371,18 +381,32 @@ namespace TestProject
                 }
                  //gg.DrawLine(new Pen(Color.Black, 4), mouseLocation2, new Point((int)ball.VLOCATION.X, (int)ball.VLOCATION.Y));
             }
+
+            if (mouseRightB)
+            {
+                if (at == 1)
+                {
+                    mouseLocation2 = e.Location;
+                    if (ball.VLOCATION.X - ball.RADIUS > leftGameWallX1 & ball.VLOCATION.X + ball.RADIUS < rightGameWallX1)
+                    {
+                        ball.VLOCATION.X = mouseLocation2.X;
+                    }
+                }
+                
+            }
         }
 
         // возникает при отпускании кнопки мыши
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
             // кнопка отжата
-            mouseDown = false;
+            
+            mouseRightB = false;
             mouseLocation2 = e.Location;
             Vector2D v;
 
             // если ход игрока и он еще не ходил
-            if (at == 1 && isNotUsed)
+            if (at == 1 && isNotUsed && mouseDown)
             {
                 // проверка на недопустимость перемещения вниз
                 if (e.Location.Y < ball.VLOCATION.Y)
@@ -471,10 +495,12 @@ namespace TestProject
                 }
 
                 ball.VSPEED.Y = v.Y/10;*/
-                Console.WriteLine("p: " + v.X + " " + v.Y);
-                Console.WriteLine("p: " + ball.VSPEED.X + " " + ball.VSPEED.Y);
+               /* Console.WriteLine("p: " + v.X + " " + v.Y);
+                Console.WriteLine("p: " + ball.VSPEED.X + " " + ball.VSPEED.Y);*/
             }
-            
+
+            mouseDown = false;
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
