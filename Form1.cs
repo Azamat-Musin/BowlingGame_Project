@@ -37,6 +37,7 @@ namespace TestProject
         bool isNotUsed = true;
         // для паузы в игре
         bool isNotStoped = true;
+        bool isTraining;
 
         // переменные отвечающие за границы игрового поля
         int leftGameWallX1;
@@ -51,12 +52,14 @@ namespace TestProject
         // для черных линий 
         int blackLineHeight;
         int dHeight;
+        int sc = 0;
+        int scB = 0;
 
 
 
 
         // передача экземляра формы, от которой создалась эта форма(т.е. форма Menu)
-        public Form1(Menu menuForm)
+        public Form1(Menu menuForm, bool isLesson)
         {
             // двойная буфферизация - создание следующего изображения(подгрузка) до отображения
             // помогает устранить мерцание, но тут мерцание устранено благодаря:
@@ -73,6 +76,8 @@ namespace TestProject
             //      сделать предыдущее окно невидимым во время активного окна(текущего), т.е. Form1
             menuF = menuForm;
 
+            // тренировка или игра
+            isTraining = isLesson;
             // утсановка размеров, цвета фона, расположения, отключение рамок окна
             // задание размеров именно окна(без учета рамок), ибо this.Size = new Size(); это задание размеров окна с учетом рамок
             this.ClientSize = new Size(800, 700);
@@ -324,10 +329,47 @@ namespace TestProject
                 // рисуем полоску от шара до курсора
                 if (at == 1) 
                 {
+
+                    int mX = -3 * (e.Location.X - (int)ball.VLOCATION.X) + (int)ball.VLOCATION.X; // mX
+                    int mY = -3 * (e.Location.Y - (int)ball.VLOCATION.Y) + (int)ball.VLOCATION.Y; // mY
                     gg.DrawLine(new Pen(Color.Black, 4), mouseLocation2, new Point((int)ball.VLOCATION.X, (int)ball.VLOCATION.Y));
 
+                    if (isTraining)
+                    {
+                        if (mX >= rightGameWallX1)
+                        {
+                            int dX = rightGameWallX1 - mX; // dX
+                            int dY = ((rightGameWallX1 - mX) * ((int)ball.VLOCATION.Y - mY)) / ((int)ball.VLOCATION.X - mX) + mY; // dY 
+
+                            gg.DrawLine(new Pen(Color.Black, 3), new Point(rightGameWallX1, dY),
+                                            new Point((int)ball.VLOCATION.X, (int)ball.VLOCATION.Y));
+
+                            gg.DrawLine(new Pen(Color.Black, 3), new Point(mX + 2 * dX, mY), new Point(rightGameWallX1, dY));
+
+                        }
+                        else if (mX <= leftGameWallX1)
+                        {
+                            int dX = mX - leftGameWallX1; // dX
+                            int dY = ((leftGameWallX1 - mX) * ((int)ball.VLOCATION.Y - mY)) / ((int)ball.VLOCATION.X - mX) + mY; // dY 
+
+                            gg.DrawLine(new Pen(Color.Black, 3), new Point(leftGameWallX1, dY),
+                                            new Point((int)ball.VLOCATION.X, (int)ball.VLOCATION.Y));
+
+                            gg.DrawLine(new Pen(Color.Black, 3), new Point(mX - 2 * dX, mY), new Point(leftGameWallX1, dY));
+
+                        }
+                        else
+                        {
+                            gg.DrawLine(new Pen(Color.Black, 3), new Point(mX, mY), new Point((int)ball.VLOCATION.X, (int)ball.VLOCATION.Y));
+                        }
+                    }
+                    else
+                    {
+                        gg.DrawLine(new Pen(Color.Black, 4), mouseLocation2, new Point((int)ball.VLOCATION.X, (int)ball.VLOCATION.Y));
+                    }
+
                 }
-               // gg.DrawLine(new Pen(Color.Black, 4), mouseLocation2, new Point((int)ball.VLOCATION.X, (int)ball.VLOCATION.Y));
+                 //gg.DrawLine(new Pen(Color.Black, 4), mouseLocation2, new Point((int)ball.VLOCATION.X, (int)ball.VLOCATION.Y));
             }
         }
 
@@ -352,36 +394,85 @@ namespace TestProject
                     v = new Vector2D(ball.VLOCATION.X - e.Location.X, ball.VLOCATION.Y - e.Location.Y);
 
                     // задание скорости в зависимости от отдаления мыши от шара
-                    if (v.Length() < 15)
+                    if (v.Length() < 40)
                     {
-                        ball.SetSpeedKoef(3f);
+                        ball.SetSpeedKoef(1f);
                     }
-                    else if (v.Length() > 15 & v.Length() < 30)
+                    else if (v.Length() > 40 & v.Length() < 80)
                     {
-                        ball.SetSpeedKoef(6f);
+                        ball.SetSpeedKoef(1f);
                     }
-                    else if (v.Length() > 30 & v.Length() < 60)
+                    else if (v.Length() > 80 & v.Length() < 120)
                     {
-                        ball.SetSpeedKoef(9f);
+                        ball.SetSpeedKoef(2f);
                     }
-                    else if (v.Length() > 60 & v.Length() < 90)
+                    else if (v.Length() > 120 & v.Length() < 160)
                     {
-                        ball.SetSpeedKoef(12f);
+                        ball.SetSpeedKoef(4f);
                     }
                     else
                     {
-                        ball.SetSpeedKoef(20f);
+                        ball.SetSpeedKoef(5f);
                     }
+                    //ball.SetSpeedKoef(1f);
                     // нормализация вектора направления
                     v = v.Unit();
-
-                    // тех. данные
-                    // замеры скорости шара
-                    //Console.WriteLine(v.X + " " + v.Y); 
+                    ball.VSPEED = v;
+                    
+                    
                     
                 }
                 isNotUsed = false;
-                ball.VSPEED = v;
+                /*if (v.X > 0)
+                {
+                    if (v.X > 10 & v.X < 100)
+                    {
+                        ball.VSPEED.X = v.X / 10;
+                    }
+                    else if (v.X > 99)
+                    {
+                        ball.VSPEED.X = v.X / 100;
+                    }
+                    else
+                    {
+                        ball.VSPEED.X = v.X;
+                    }
+                }
+                else
+                {
+                    if (v.X < -10 & v.X > -100)
+                    {
+                        ball.VSPEED.X = v.X / 10;
+                    }
+                    else if (v.X < -99)
+                    {
+                        ball.VSPEED.X = v.X / 100;
+                    }
+                    else
+                    {
+                        ball.VSPEED.X = v.X;
+                    }
+                }
+
+
+
+
+                if (v.Y < -10 & v.Y > -100)
+                {
+                    ball.VSPEED.Y = v.Y / 10;
+                }
+                else if (v.Y < -99)
+                {
+                    ball.VSPEED.Y = v.Y / 100;
+                }
+                else
+                {
+                    ball.VSPEED.Y = v.Y;
+                }
+
+                ball.VSPEED.Y = v.Y/10;*/
+                Console.WriteLine("p: " + v.X + " " + v.Y);
+                Console.WriteLine("p: " + ball.VSPEED.X + " " + ball.VSPEED.Y);
             }
             
         }
@@ -401,7 +492,7 @@ namespace TestProject
             // интервал таймера равен 10 (10*100=1000мс=1сек)
             //тут можно менять число в сравнении, пока тесты, тут стоит 600(6сек +-), но потом ставь 1000-1500 значение равное 15-30сек в реальности
             // лучше будет что-то около 10сек = 1000 в коде сравнения ниже
-            if (GameStatus.playerRound >= 200)
+            if (GameStatus.playerRound >= 800)
             {
                 // at - переменная, которая в случае 1 означает, что ход игрока, в случае -1, что ход бота
                 if (at == 1)
@@ -426,7 +517,10 @@ namespace TestProject
                     float y = rnd.Next(-4, -2);
                     float k = rnd.Next(3, 8);
                     ball.VSPEED = new Vector2D(x, y);
-                    ball.SetSpeedKoef(k);                 
+                    ball.SetSpeedKoef(k);
+
+                    
+                    Console.WriteLine("b: " + ball.VSPEED.X + " " + ball.VSPEED.Y);
                 }
                 else
                 {
@@ -493,7 +587,8 @@ namespace TestProject
                         if (arrPins[i].IsCollisoinWithBall(arrPins[j]))
                         {
                             arrPins[j].COLOR = Color.Red;
-                            arrPins[i].BallAndBallCollisionPhysics(arrPins[j]);                          
+                            //arrPins[i].BallAndBallCollisionPhysics(arrPins[j]);
+                            arrPins[i].PinAndPinCollisionphysics(arrPins[j]);
                         }
                     }
                 }
@@ -509,38 +604,98 @@ namespace TestProject
             for (int i = 0; i < 10; i++)
             {
                 arrPins[i].MovePin();
-                if (arrPins[i].VSPEED.X != 0 || arrPins[i].VSPEED.Y != 0)
-                {
-                    if (arrPins[i].KSPEEDPIN > 0)
-                    {
-                        arrPins[i].UpdateStopSpeedPinKoef();
-                    }
-                    else if ((arrPins[i].VSPEED.X == 0 || arrPins[i].VSPEED.Y == 0) && arrPins[i].KSPEEDPIN == 0)
-                    {
-                        arrPins[i].VSPEED = new Vector2D(0f, 0f);
-                    }
-                    
 
+                
+                if ((arrPins[i].VSPEED.X != 0 || arrPins[i].VSPEED.Y < 0) & arrPins[i].KSPEEDPIN > 0)
+                {
+
+                    arrPins[i].UpdateStopSpeedPinKoef();
                 }
+                
+
+                /*  if (arrPins[i].VSPEED.X != 0 || arrPins[i].VSPEED.Y != 0)
+                  {
+                      if (arrPins[i].KSPEEDPIN > 0)
+                      {
+                          arrPins[i].UpdateStopSpeedPinKoef();
+                      }
+                      else if ((arrPins[i].VSPEED.X == 0 || arrPins[i].VSPEED.Y == 0) && arrPins[i].KSPEEDPIN == 0)
+                      {
+                          arrPins[i].VSPEED = new Vector2D(0f, 0f);
+                      }
+                  }*/
+
+
+
             }
 
             // смещение для шара и физика замедления
             ball.MoveBall();
 
-            if (ball.VSPEED.X != 0 || ball.VSPEED.Y != 0)
-            {
-                if (ball.KPEEDBALL > 0)
-                {
-                    ball.UpdateStopSpeedBallKoef();
 
-                }
 
-            }
-            else if ((ball.VSPEED.X == 0 || ball.VSPEED.Y == 0) && ball.KPEEDBALL == 0)
+
+
+            if (ball.VSPEED.X > 0)
             {
-                ball.VSPEED = new Vector2D(0f, 0f);
-                
+                ball.UpdateBallX();
             }
+            if (ball.VSPEED.X < 0)
+            {
+                ball.UpdateBallX();
+            }
+            if (ball.VSPEED.Y < 0)
+            {
+                ball.UpdateBallY();
+            }
+
+            /*if ((ball.VSPEED.X > 0 & ball.VSPEED.Y < 0) & ball.KPEEDBALL > 0)
+            {
+
+                ball.UpdateStopSpeedBallKoef();
+            }
+            if ((ball.VSPEED.X < 0 & ball.VSPEED.Y < 0) & ball.KPEEDBALL > 0)
+            {
+
+                ball.UpdateStopSpeedBallKoef();
+            }
+            if ((ball.VSPEED.X == 0 & ball.VSPEED.Y < 0) & ball.KPEEDBALL > 0)
+            {
+
+                ball.UpdateStopSpeedBallKoef();
+            }
+            if ((ball.VSPEED.X > 0 & ball.VSPEED.Y > 0) & ball.KPEEDBALL > 0)
+            {
+
+                ball.UpdateStopSpeedBallKoef();
+            }
+            if ((ball.VSPEED.X > 0 & ball.VSPEED.Y < 0) & ball.KPEEDBALL > 0)
+            {
+
+                ball.UpdateStopSpeedBallKoef();
+            }*/
+
+
+
+            
+
+
+
+
+            /* if (ball.VSPEED.X != 0 || ball.VSPEED.Y != 0)
+             {
+                 if (ball.KPEEDBALL > 0)
+                 {
+                     ball.UpdateStopSpeedBallKoef();
+
+                 }
+
+             }
+             else if ((ball.VSPEED.X == 0 || ball.VSPEED.Y == 0) && ball.KPEEDBALL == 0)
+             {
+                 ball.VSPEED = new Vector2D(0f, 0f);
+
+             }*/
 
         }
 

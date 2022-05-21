@@ -24,10 +24,10 @@ namespace TestProject
         // для шара, нужен для скорости
         private float kSpeedBall = 6f;
         //для кегли, нужен для скорости
-        private float kSpeedPin = 1f;
+        private float kSpeedPin = 0.8f;
         //эти коэф. для замедления шара и кегли соотв.
         private float kStopSpeedBall = 0.1f;
-        private float kStopSpeedPin = 0.1f;
+        private float kStopSpeedPin = 0.02f;
 
         public Color COLOR
         {
@@ -202,7 +202,18 @@ namespace TestProject
            /* this.VSPEED.Unit();
             b2.VSPEED.Unit();*/
             
+        }
 
+        public void PinAndPinCollisionphysics(Ball b2)
+        {
+            Vector2D v1 = new Vector2D(this.VLOCATION.X, this.VLOCATION.Y, b2.VLOCATION.X, b2.VLOCATION.Y);
+            Vector2D v2 = new Vector2D(b2.VLOCATION.X, b2.VLOCATION.Y, this.VLOCATION.X, this.VLOCATION.Y);
+
+            v1 = v1.Unit();
+            v2 = v2.Unit();
+
+            this.VSPEED = this.VSPEED + v2;
+            b2.VSPEED = b2.VSPEED + v1;
         }
 
         // результат столкновения со стеной
@@ -229,7 +240,19 @@ namespace TestProject
         // обновление скорости шара - замедление
         public void UpdateStopSpeedBallKoef()
         {
+            
             this.kSpeedBall -= this.kStopSpeedBall;
+        }
+
+        public void UpdateBallX()
+        {
+            this.VSPEED.X -= this.kStopSpeedBall;
+        }
+
+        public void UpdateBallY()
+        {
+            this.VSPEED.Y -= this.kStopSpeedBall;
+
         }
 
         // обновление скорости кегли - замедление

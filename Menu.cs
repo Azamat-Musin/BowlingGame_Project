@@ -25,12 +25,17 @@ namespace TestProject
         private void Menu_Load(object sender, EventArgs e)
         {
             // установка раположения и цвета кнопкам 
-            Point p1 = new Point((this.ClientSize.Width - button1.Width) / 2, 100);
-            Point p2 = new Point((this.ClientSize.Width - button2.Width) / 2, 100 + button1.Height + 10);
+            Point p1 = new Point((this.ClientSize.Width - button1.Width) / 2, 70);
+            Point p2 = new Point((this.ClientSize.Width - button2.Width) / 2, p1.Y + button1.Height + 10);
+            Point p3 = new Point((this.ClientSize.Width - button3.Width) / 2, p2.Y + button2.Height + 10);
             button1.BackColor = ColorTranslator.FromHtml("#B0E0E6");
             button2.BackColor = ColorTranslator.FromHtml("#B0E0E6");
+            button3.BackColor = ColorTranslator.FromHtml("#B0E0E6");
+
             button1.Location = p1;
-            button2.Location = p2;
+            button2.Location = p3;
+            button3.Location = p2;
+
         }
 
         // ДЛЯ ТЕБЯ
@@ -64,7 +69,7 @@ namespace TestProject
         private void button1_Click_1(object sender, EventArgs e)
         {
             Menu m = this;
-            Form1 gameform = new Form1(m);
+            Form1 gameform = new Form1(m, false);
             this.Visible = false;
             gameform.Show();
         }
@@ -73,6 +78,14 @@ namespace TestProject
         private void button2_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Menu m = this;
+            Form1 gameform = new Form1(m, true);
+            this.Visible = false;
+            gameform.Show();
         }
     }
 }
